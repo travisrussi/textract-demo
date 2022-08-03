@@ -57,6 +57,11 @@ To push the local `.env` variables up to Heroku:
 heroku config:push --overwrite
 ```
 
+It's also helpful to set the Heroku Url as a config variable for access in the app:
+```bash
+heroku config:set HEROKU_URL=$(heroku info -s | grep web_url | cut -d= -f2)
+```
+
 ## Setup SqlAlchemy
 
 (SqlAlchemy for Flask)[https://flask-sqlalchemy.palletsprojects.com/en/2.x/]
