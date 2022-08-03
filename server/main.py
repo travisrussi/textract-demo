@@ -61,5 +61,5 @@ def get_img_details(id):
 
     return jsonify(
         filename=img.name,
-        image_url=heroku_url + "/image/" + str(img.id)
+        image_url=heroku_url + "image/" + str(img.id)
     )
