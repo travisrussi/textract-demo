@@ -6,6 +6,9 @@ from models import Img
 from flask import Flask, request, Response, jsonify
 from werkzeug.utils import secure_filename
 
+# import asyncio
+import boto3, botocore
+from s3 import upload_file_to_s3
 
 app= Flask(__name__)
 
@@ -15,6 +18,18 @@ heroku_url = os.environ.get('HEROKU_URL')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("SQLALCHEMY_DATABASE_URI") # 'sqlite:///img.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db_init(app)
+
+# Setup S3 integration
+app.config['S3_BUCKET'] = os.environ.get("S3_BUCKET")
+app.config['S3_KEY'] = os.environ.get("S3_KEY")
+app.config['S3_SECRET'] = os.environ.get("S3_SECRET")
+app.config['S3_LOCATION'] = 'http://{}.s3.amazonaws.com/'.format(app.config['S3_BUCKET'])
+
+s3 = boto3.client(
+   "s3",
+   aws_access_key_id=app.config['S3_KEY'],
+   aws_secret_access_key=app.config['S3_SECRET']
+)
 
 @app.route('/')
 def index():
@@ -40,7 +55,9 @@ def upload_file():
         db.session.add(img)
         db.session.commit()
 
-        return 'Img Uploaded!', 200
+        output = upload_file_to_s3(s3, file, app.config["S3_BUCKET"], app)
+
+        return 'Img Uploaded to S3!', 200
     else:
         return redirect("/")
 
@@ -63,3 +80,4 @@ def get_img_details(id):
         filename=img.name,
         image_url=heroku_url + "image/" + str(img.id)
     )
+

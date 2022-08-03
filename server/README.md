@@ -16,6 +16,13 @@ To run the server locally (via Heroku CLI):
     heroku local
 ```
 
+### Add Dependencies
+
+After adding some dependencies, update the `requirements.txt` file:
+```bash
+pip3 freeze > requirements.txt
+```bash
+
 ## Setup For Deployment to Heroku
 
 - [Heroku CLI Cheatsheet](https://gist.github.com/1000miles/4547e07d7815b9701c145c3a3860ffb9)
@@ -66,3 +73,17 @@ heroku config:set HEROKU_URL=$(heroku info -s | grep web_url | cut -d= -f2)
 
 (SqlAlchemy for Flask)[https://flask-sqlalchemy.palletsprojects.com/en/2.x/]
 
+## Setup S3 Integration
+
+To upload to an S3 bucket, you have to create a user via IAM with S3 permissions.
+
+Create these environment variables:
+```bash
+heroku config:set S3_BUCKET=my-s3-upload-bucket
+heroku config:set S3_KEY=iam-user-key
+heroku config:set S3_SECRET=iam-user-secret
+```
+
+Once the IAM and S3 items are setup on AWS, doing the file upload via Flask is pretty straightforward using these instructions:
+
+- [2 ways to upload files to Amazon S3 in Flask](https://rajrajhans.com/2020/06/2-ways-to-upload-files-to-s3-in-flask/)
