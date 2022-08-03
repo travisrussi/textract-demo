@@ -56,3 +56,8 @@ To push the local `.env` variables up to Heroku:
 ```bash
 heroku config:push --overwrite
 ```
+
+## Setup SqlAlchemy
+
+(SqlAlchemy for Flask)[https://flask-sqlalchemy.palletsprojects.com/en/2.x/]
+
