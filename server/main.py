@@ -38,9 +38,9 @@ def index():
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
-    if "pic" not in request.files:
-        return "No pic key in request.files"
-    file = request.files["pic"]
+    if "doc" not in request.files:
+        return "No doc key in request.files"
+    file = request.files["doc"]
     if file.filename == "":
         return "Please select a file"
     if file:
