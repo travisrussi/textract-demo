@@ -1,5 +1,5 @@
 
-def upload_file_to_s3(s3, file, bucket_name, app):
+def upload_file_to_s3(s3, file, bucket_name, app, acl="public-read"):
     """
     Docs: http://boto3.readthedocs.io/en/latest/guide/s3.html
     """
@@ -9,7 +9,7 @@ def upload_file_to_s3(s3, file, bucket_name, app):
             bucket_name,
             file.filename,
             ExtraArgs={
-                # "ACL": acl,
+                "ACL": acl,
                 "ContentType": file.content_type    #Set appropriate content type as per the file
             }
         )

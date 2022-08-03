@@ -75,7 +75,7 @@ heroku config:set HEROKU_URL=$(heroku info -s | grep web_url | cut -d= -f2)
 
 ## Setup S3 Integration
 
-To upload to an S3 bucket, you have to create a user via IAM with S3 permissions.
+To upload to an S3 bucket, you have to create a user via IAM with S3 permissions. Make sure the S3 bucket has `ACLs enabled` for `Object Ownership`. You also have to uncheck the two `Block public access` flags for `ACLs`.
 
 Create these environment variables:
 ```bash

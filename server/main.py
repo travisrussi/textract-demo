@@ -3,7 +3,7 @@ import os
 from db import db_init, db
 from models import Img
 
-from flask import Flask, request, Response, jsonify
+from flask import Flask, request, Response, jsonify, redirect
 from werkzeug.utils import secure_filename
 
 # import asyncio
@@ -33,7 +33,7 @@ s3 = boto3.client(
 
 @app.route('/')
 def index():
-  return "<h1>Welcome to CodingX</h1><h2>PROJECT_PATH: " + os.environ.get('PROJECT_PATH') + "</h2>"
+  return "<h1>Textract Demo Server</h1><h2>PROJECT_PATH: " + os.environ.get('PROJECT_PATH') + "</h2>"
 
 
 @app.route("/upload", methods=["POST"])
@@ -50,7 +50,7 @@ def upload_file():
         if not file.filename or not file.mimetype:
             return 'Bad upload!', 400
 
-        img = Img(img=file.read(), name=file.filename, mimetype=file.mimetype)
+        img = Img(name=file.filename, mimetype=file.mimetype, s3bucket=app.config["S3_BUCKET"])
         # img = Img(name=file.filename, mimetype=file.mimetype)
         db.session.add(img)
         db.session.commit()
@@ -68,7 +68,7 @@ def get_img_object(id):
     if not img:
         return 'Img Not Found!', 404
 
-    return Response(img.img, mimetype=img.mimetype)
+    return redirect(app.config["S3_LOCATION"] + img.name)
 
 @app.route('/<int:id>')
 def get_img_details(id):
@@ -78,6 +78,6 @@ def get_img_details(id):
 
     return jsonify(
         filename=img.name,
-        image_url=heroku_url + "image/" + str(img.id)
+        image_url=app.config["S3_LOCATION"] + img.name
     )
 
