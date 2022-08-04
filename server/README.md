@@ -16,6 +16,16 @@ To run the server locally (via Heroku CLI):
     heroku local
 ```
 
+## API Routes
+
+- `POST /document` - Upload a document for processing
+- `GET  /document/all` - Returns all the documents in the database
+- `GET  /document/[id]` - Returns the details of a single document
+- `GET  /document/[id]/download` - Redirects to the original document in S3
+- `GET  /document/[id]/parse/start` - Initiates the textract parsing process
+- `GET  /document/[id]/parse/status` - Gets the current status of the textract parsing process
+- `GET  /document/[id]/parse/result` - Gets the result of the textract parsing process
+
 ### Add Dependencies
 
 After adding some dependencies, update the `requirements.txt` file:

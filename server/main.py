@@ -45,7 +45,7 @@ def index():
   return "<h1>Textract Demo Server</h1><h2>PROJECT_PATH: " + os.environ.get('PROJECT_PATH') + "</h2>"
 
 
-@app.route("/upload", methods=["POST"])
+@app.route("/document", methods=["POST"])
 def upload_file():
     if "doc" not in request.files:
         return "No doc key in request.files"
