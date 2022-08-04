@@ -81,6 +81,12 @@ def get_doc_details(id):
         image_url=app.config["S3_LOCATION"] + doc.fileName
     )
 
+@app.route('/document/all')
+def get_all_doc_details():
+    docs = Doc.query.all()
+
+    return jsonify(docs)
+
 @app.route('/document/<int:id>/download')
 def get_doc_object(id):
     doc = Doc.query.filter_by(id=id).first()
@@ -148,41 +154,45 @@ def get_parse_result(id):
     if not doc.jobId:
         return 'Doc Not Started!', 400
 
+    # only download and parse the response onced
     if "DOWNLOADED" not in doc.jobStatus:
         response = get_response(textract, doc.jobId)
-    
+
         if not response:
             return 'Unable to get job response', 400
 
         doc.jobResponse = json.dumps(response)
 
-        # jobStatus = response["JobStatus"]
-        doc.jobStatus = "DOWNLOADED" # response["JobStatus"]
-
-        # documentMetadata = response["DocumentMetadata"]
-        if response["DocumentMetadata"]:
+        if "JobStatus" in response:
+            doc.jobStatus = response["JobStatus"]
+        
+        if "DocumentMetadata" in response:
             doc.documentMetadata = json.dumps(response["DocumentMetadata"])
         
-        # blocks = response["Blocks"]
-        if response["Blocks"]:
+        if "Blocks" in response:
             doc.blocks = json.dumps(response["Blocks"])
         
-        # responseMetadata = response["ResponseMetadata"]
-        if response["ResponseMetadata"]:
+        if "ResponseMetadata" in response:
             doc.responseMetadata = json.dumps(response["ResponseMetadata"])
 
-        # detectDocumentTextModelVersion = response["DetectDocumentTextModelVersion"]
-        if response["DetectDocumentTextModelVersion"]:
+        if "DetectDocumentTextModelVersion" in response:
             doc.detectDocumentTextModelVersion = response["DetectDocumentTextModelVersion"]
-        
-        db.session.commit()
+    
+
+    # manually set the jobStatus to 'DOWNLOADED' if the processing is complete and the response has be parsed
+    if "SUCCEEDED" in doc.jobStatus and len(doc.jobResponse) > 0:
+        doc.jobStatus = "DOWNLOADED"
+
+    db.session.commit()
 
     return jsonify(
         id=doc.id,
         job_id=doc.jobId,
         job_status=doc.jobStatus,
-        blocks=json.loads(doc.blocks),
-        document_metadata=json.loads(doc.documentMetadata),
-        response_metadata=json.loads(doc.responseMetadata),
-        detect_document_text_model_version=json.loads(doc.detectDocumentTextModelVersion)
+        # job_response=json.loads(doc.jobResponse) if doc.jobResponse else "",
+        blocks=json.loads(doc.blocks) if doc.blocks else "",
+        document_metadata=json.loads(doc.documentMetadata) if doc.documentMetadata else "",
+        response_metadata=json.loads(doc.responseMetadata) if doc.responseMetadata else "",
+        detect_document_text_model_version=json.loads(doc.detectDocumentTextModelVersion) if doc.detectDocumentTextModelVersion else 0
     )
+        
