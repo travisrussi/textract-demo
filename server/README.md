@@ -79,6 +79,7 @@ To upload to an S3 bucket, you have to create a user via IAM with S3 permissions
 
 Create these environment variables:
 ```bash
+heroku config:set AWS_DEFAULT_REGION=us-east-1
 heroku config:set S3_BUCKET=my-s3-upload-bucket
 heroku config:set S3_KEY=iam-user-key
 heroku config:set S3_SECRET=iam-user-secret
